@@ -37,6 +37,51 @@ import org.springframework.lang.Nullable;
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
  */
+/**
+ * NOTE
+ * 2017-09-08
+ * 
+ * SpringIOC容器管理了定义的各种Bean对象及其相互的关系
+ * Bean对象在Spring实现中是以BeanDefinition来描述的
+ * 其继承关系如下：
+ * 						AttributeAccessor
+ * 								|
+ * 		~~~~~~~~~~~~~~~~~~~~~~~~-------------------------
+ * 		~		   										|
+ * 		~												|
+ * 		~												|
+ * 	AttributeAccessorSuppport							|
+ * 		|				BeanMetadataElement				|
+ * 		|						|						|
+ * 		|			~~~~~~~~~~~~~----------------		|
+ * 		|			~							|		|
+ * 	BeanMetadataAttributeAccessor 			BeanDifinition
+ * 					|							~
+ * 					---------------~~~~~~~~~~~~~~
+ * 								|
+ * 						AbstractBeanDefiniton
+ * 								|
+ * 						RootBeanDefinition
+ * Bean的解析过程非常复杂，功能被分的很细
+ * 因为需要被扩展的地方很多，必须保证有足够的灵活性
+ * 以应对可能的变化
+ * 
+ * Bean的解析主要就是对Spring配置文件的解析
+ * 这个解析过程主要通过下图的类完成
+ * 
+ * 		BeanDefinitionReader				BeanDefinitionDocumentReader
+ * 				~							~						 ~
+ * AbstractBeanDefinitionReader DefaultBeanDefinitionDocumentReader  ~
+ * 				|							~						 ~
+ * 				----------------~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * 								|			~						 ~
+ * 								XmlBeanDefinitionReader
+ * 
+ * 
+ * 
+ * @author 2bai
+ * @since 5.0
+ */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
