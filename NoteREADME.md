@@ -57,7 +57,16 @@
 > ApplicationContext允许上下文嵌套，通过保持父上下文可以维持一个上下文体系。对于bean的查找可以在这个上下文体系中发生，首先检查当前上下文，其次是父上下文，逐级向上，这样为不同的Spring应用提供了一个共享的bean定义环境。
 
 
-
 **IOC容器的创建过程**
 * XmlBeanFactory
-* 
+
+
+	//根据 Xml 配置文件创建 Resource 资源对象，该对象中包含了 BeanDefinition 的信息 ClassPathResource resource =new ClassPathResource("application-context.xml");
+	//创建 DefaultListableBeanFactory
+	DefaultListableBeanFactory factory =new DefaultListableBeanFactory();
+	//创建 XmlBeanDefinitionReader 读取器，用于载入 BeanDefinition。之所以需要 BeanFactory 作为参数，是因为会 将读取的信息回调配置给 factory
+	XmlBeanDefinitionReader reader =new XmlBeanDefinitionReader(factory);
+	//XmlBeanDefinitionReader 执行载入 BeanDefinition 的方法，最后会完成 Bean 的载入和注册。完成后 Bean 就成功 的放置到 IOC 容器当中，以后我们就可以从中取得 Bean 来使用
+	reader.loadBeanDefinitions(resource);
+	
+* FileSystemXmlApplicationContext	

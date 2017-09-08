@@ -53,6 +53,22 @@ import org.springframework.lang.Nullable;
  * @see #getResourceByPath
  * @see GenericApplicationContext
  */
+/**
+ * NOTE
+ * 2017-09-08
+ * 
+ * 设置资源加载器和资源定位
+ * 
+ * 构造方法：
+ * 1.调用父类容器的构造方法(super(parent)方法)为容器设置好Bean资源加载器
+ * 2.调用父类AbstractRefreshableConfigApplicationContext的setConfigLocations(configLocations)
+ *   设置Bean定义资源文件的定位路径
+ * 
+ * 父类的父类AbstractApplicationContext
+ * 
+ * @author 2bai
+ * @since 5.0
+ */
 public class FileSystemXmlApplicationContext extends AbstractXmlApplicationContext {
 
 	/**
@@ -90,6 +106,12 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * from the given XML files and automatically refreshing the context.
 	 * @param configLocations array of file paths
 	 * @throws BeansException if context creation failed
+	 */
+	/**
+	 * NOTE
+	 * 2017-09-08
+	 * 
+	 * 创建一个对象，从XML文件加载定义并自动刷新context
 	 */
 	public FileSystemXmlApplicationContext(String... configLocations) throws BeansException {
 		this(configLocations, true, null);
@@ -131,6 +153,12 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * @param parent the parent context
 	 * @throws BeansException if context creation failed
 	 * @see #refresh()
+	 */
+	/**
+	 * NOTE
+	 * 2017-09-08
+	 * 
+	 * 实际使用
 	 */
 	public FileSystemXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)

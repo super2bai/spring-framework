@@ -148,10 +148,20 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
 
-
+	/**
+	 * NOTE
+	 * 2017-09-08
+	 * 静态初始化块，在整个容器创建过程中只执行一次
+	 */
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues
 		// on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		/**
+		 * NOTE
+		 * 2017-09-08
+		 * 为了避免应用程序在Weblogic8.1关闭时出现类加载异常问题
+		 * 加载IoC容器关闭事件(ContextClosedEvent)类
+		 */
 		ContextClosedEvent.class.getName();
 	}
 
@@ -225,6 +235,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Create a new AbstractApplicationContext with the given parent context.
 	 * @param parent the parent context
+	 */
+	/**
+	 * NOTE
+	 * 2017-09-08
+	 * 
+	 * FileSystemXmlApplicationContext调用父类构造方法中调用的就是该方法
 	 */
 	public AbstractApplicationContext(@Nullable ApplicationContext parent) {
 		this();
@@ -449,6 +465,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @return the ResourcePatternResolver for this context
 	 * @see #getResources
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
+	 */
+	/**
+	 * NOTE
+	 * 2017-09-08
+	 * 
+	 * 获取一个Spring Source的加载器用于读入Spring Bean定义资源文件
+	 * 
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
 		return new PathMatchingResourcePatternResolver(this);
