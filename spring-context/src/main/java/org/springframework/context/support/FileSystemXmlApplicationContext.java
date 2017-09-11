@@ -64,8 +64,6 @@ import org.springframework.lang.Nullable;
  * 2.调用父类AbstractRefreshableConfigApplicationContext的setConfigLocations(configLocations)
  *   设置Bean定义资源文件的定位路径
  * 
- * 父类的父类AbstractApplicationContext
- * 
  * @author 2bai
  * @since 5.0
  */
@@ -111,6 +109,7 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * NOTE
 	 * 2017-09-08
 	 * 
+	 * 构造函数
 	 * 创建一个对象，从XML文件加载定义并自动刷新context
 	 */
 	public FileSystemXmlApplicationContext(String... configLocations) throws BeansException {
@@ -159,12 +158,16 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * 2017-09-08
 	 * 
 	 * 实际使用
+	 * 通过调用父类的方法进行对Bean定义资源文件的定位
 	 */
 	public FileSystemXmlApplicationContext(
 			String[] configLocations, boolean refresh, @Nullable ApplicationContext parent)
 			throws BeansException {
 
 		super(parent);
+		/*
+		 * 调用父类AbstractRefreshableConfigApplicationContext的方法进行对Bean定义资源文件的定位
+		 */
 		setConfigLocations(configLocations);
 		if (refresh) {
 			refresh();

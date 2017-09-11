@@ -65,6 +65,19 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * i.e. with distinct locations separated by commas, semicolons or whitespace.
 	 * <p>If not set, the implementation may use a default as appropriate.
 	 */
+	/**
+	 * NOTE
+	 * 2017-09-11
+	 * 
+	 * 处理单个资源文件路径为一个字符串的情况
+	 * CONFIG_LOCATION_DELIMITERS在其父类ConfigurableApplicationContext
+	 * String CONFIG_LOCATION_DELIMITERS = ",; \t\n";
+	 * 即多个资源文件路径之间用上述这些符号分隔，解析成数组形式
+	 * 
+	 * 中有定义
+	 * 
+	 * @param location
+	 */
 	public void setConfigLocation(String location) {
 		setConfigLocations(StringUtils.tokenizeToStringArray(location, CONFIG_LOCATION_DELIMITERS));
 	}

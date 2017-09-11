@@ -152,16 +152,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * NOTE
 	 * 2017-09-08
 	 * 静态初始化块，在整个容器创建过程中只执行一次
+	 * 为了避免应用程序在Weblogic8.1关闭时出现类加载异常问题
+	 * 加载IoC容器关闭事件(ContextClosedEvent)类
 	 */
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues
 		// on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
-		/**
-		 * NOTE
-		 * 2017-09-08
-		 * 为了避免应用程序在Weblogic8.1关闭时出现类加载异常问题
-		 * 加载IoC容器关闭事件(ContextClosedEvent)类
-		 */
 		ContextClosedEvent.class.getName();
 	}
 
@@ -471,6 +467,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * 2017-09-08
 	 * 
 	 * 获取一个Spring Source的加载器用于读入Spring Bean定义资源文件
+	 * AbstractApplicationContext继承DefaultResourceLoader
+	 * 因此也是一个资源加载器
+	 * Spring资源加载器，其getResource(String location)方法用于载入资源
 	 * 
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
@@ -489,6 +488,12 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * this (child) application context environment if the parent is non-{@code null} and
 	 * its environment is an instance of {@link ConfigurableEnvironment}.
 	 * @see ConfigurableEnvironment#merge(ConfigurableEnvironment)
+	 */
+	/**
+	 * NOTE
+	 * 2017-09-11
+	 * FileSystemXmlApplicationContext调用父类构造方法调用的就是此方法
+	 * @param parent
 	 */
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
