@@ -71,11 +71,9 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * 
 	 * 处理单个资源文件路径为一个字符串的情况
 	 * CONFIG_LOCATION_DELIMITERS在其父类ConfigurableApplicationContext
+	 * 中有定义
 	 * String CONFIG_LOCATION_DELIMITERS = ",; \t\n";
 	 * 即多个资源文件路径之间用上述这些符号分隔，解析成数组形式
-	 * 
-	 * 中有定义
-	 * 
 	 * @param location
 	 */
 	public void setConfigLocation(String location) {
@@ -91,6 +89,14 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
+				/**
+				 * NOTE
+				 * 2017-09-12
+				 * 
+				 * resolvePath为同一类中将字符串解析为路径的方法
+				 * 
+				 * 至此，Spring IOC容器在初始化时将配置的Bean定义资源文件定位为Spring封装的Resource
+				 */
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
 		}

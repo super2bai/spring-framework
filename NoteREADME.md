@@ -70,3 +70,4 @@
 	reader.loadBeanDefinitions(resource);
 	
 * FileSystemXmlApplicationContext	
+* AbstractApplicationContext的refresh函数载入Bean

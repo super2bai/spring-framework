@@ -539,26 +539,47 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.applicationListeners;
 	}
 
+	/**
+	 * NOTE
+	 * 2017-09-12
+	 * Spring IOC容器对Bean定义资源的载入是从refresh()函数开始的
+	 * refresh()是一个模版方法
+	 * 作用：
+	 * 在创建IOC容器钱，如果已经有容器存在，则需要把已有的容器销毁和关闭
+	 * 以保证在refresh之后使用的是新建立起来的IOC容器
+	 * 
+	 * refresh的作用类似于对IOC容器的重启
+	 * 在新建立好的容器中对容器进行初始化，对Bean定义资源进行载入
+	 * @throws BeansException
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			// 调用容器准备刷新的方法，获取容器的当前时间，同时给容器设置同步标识
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			// 告诉子类启动refreshBeanFactory()，Bean定义资源文件的载入从子类的refreshBeanFactory()方法启动
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
+			// 为BeanFactory配置容器特性，例如类加载器、事件处理器等
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				// 为容器的某些子类指定特殊的BeanPost事件处理器
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
+				// 调用所有注册的BeanFactoryPostProcessor的Bean
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 为BeanFactory注册BeanPost事件处理器
+				// BeanPostProcessor是
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.

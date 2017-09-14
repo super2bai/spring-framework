@@ -170,6 +170,9 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 		 */
 		setConfigLocations(configLocations);
 		if (refresh) {
+			/**
+			 * 调用父类AbstractApplicationContext的refresh方法
+			 */
 			refresh();
 		}
 	}
