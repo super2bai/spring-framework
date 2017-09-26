@@ -187,11 +187,18 @@ public class FileSystemXmlApplicationContext extends AbstractXmlApplicationConte
 	 * @return Resource handle
 	 * @see org.springframework.web.context.support.XmlWebApplicationContext#getResourceByPath
 	 */
+	/**
+	 * 为了处理既不是classpath标识
+	 * 又不是URL标识的Resource定位这种情况
+	 * @param path
+	 * @return
+	 */
 	@Override
 	protected Resource getResourceByPath(String path) {
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
+		//这里使用文件系统资源对象来定义bean文件
 		return new FileSystemResource(path);
 	}
 
