@@ -131,7 +131,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
 		/**
-		 * NOTE 2017-09-26 具体的解析过程由BeanDefinitionParserDelegate实现
+		 * NOTE<br>
+		 * 2017-09-26<br>
+		 * 具体的解析过程由BeanDefinitionParserDelegate实现<br>
 		 * BeanDefinitionParserDelegate中定义了Spring Bean定义XML文件的各种元素
 		 */
 		BeanDefinitionParserDelegate parent = this.delegate;
@@ -184,7 +186,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	/**
-	 * NOTE 2017-09-26 使用Spring的Bean规则从Document根元素开始进行Bean定义的Document对象
+	 * NOTE <br>
+	 * 2017-09-26 <br>
+	 * 使用Spring的Bean规则从Document根元素开始进行Bean定义的Document对象
 	 * 
 	 */
 	protected void parseBeanDefinitions(Element root,
@@ -217,7 +221,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 	/**
-	 * NOTE 2017-09-26 使用Spring的Bean规则解析Document元素节点
+	 * NOTE <br>
+	 * 2017-09-26 <br>
+	 * 使用Spring的Bean规则解析Document元素节点
 	 */
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
 		// 如果元素节点是<import>导入元素，进行导入解析
@@ -244,7 +250,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * into the bean factory.
 	 */
 	/**
-	 * NOTE 2017-09-26 解析<Import>导入元素，从给定的导入路径加载Bean定义资源到Sring IoC容器中
+	 * NOTE <br>
+	 * 2017-09-26 <br>
+	 * 解析<Import>导入元素，从给定的导入路径加载Bean定义资源到Sring IoC容器中
 	 * 
 	 */
 	protected void importBeanDefinitionResource(Element ele) {
@@ -385,13 +393,14 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * the registry.
 	 */
 	/**
-	 * NOTE 2017-09-26 解析Bean定义资源Document对象的普通元素
+	 * NOTE<br>
+	 * 2017-09-26<br>
+	 * 解析Bean定义资源Document对象的普通元素
 	 */
 	protected void processBeanDefinition(Element ele,
 			BeanDefinitionParserDelegate delegate) {
 		/**
-		 * BeanDefinitionHolder是对BeanDefinition的封装
-		 * 即Bean定义的封装类
+		 * BeanDefinitionHolder是对BeanDefinition的封装 即Bean定义的封装类
 		 * 
 		 * 对Docuemnt对象中的<Bean>元素的解析BeanDefinitionParserDelegate实现
 		 */
