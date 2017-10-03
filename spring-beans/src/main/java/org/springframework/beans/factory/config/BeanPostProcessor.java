@@ -40,6 +40,17 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableBeanFactory#addBeanPostProcessor
  * @see BeanFactoryPostProcessor
  */
+/**
+ * NOTE
+ * 2017-10-01
+ * 
+ * BeanPostProcessor后置处理器的实现
+ * 
+ * 1.真正创建Bean的方法
+ * 
+ * @author 2bai
+ * @since 5.0
+ */
 public interface BeanPostProcessor {
 
 	/**
@@ -55,6 +66,7 @@ public interface BeanPostProcessor {
 	 * @throws org.springframework.beans.BeansException in case of errors
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 */
+	// 在为Bean的初始化前提供回调入口
 	@Nullable
 	default Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
@@ -81,6 +93,7 @@ public interface BeanPostProcessor {
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet
 	 * @see org.springframework.beans.factory.FactoryBean
 	 */
+	// 在为Bean的初始化后提供回调入口
 	@Nullable
 	default Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 		return bean;

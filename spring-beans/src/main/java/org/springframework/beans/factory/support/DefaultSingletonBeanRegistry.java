@@ -408,29 +408,49 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param dependentBeanName the name of the dependent bean
 	 */
+	/**
+	 * NOTE
+	 * 2017-10-01
+	 * 
+	 * Spring IoC容器autowiring实现原理
+	 * DefaultSingletonBeanRegistry的registerDependentBean方法对属性注入
+	 * 
+	 * 为指定的Bean注入依赖的Bean
+	 * @param beanName
+	 * @param dependentBeanName
+	 */
 	public void registerDependentBean(String beanName, String dependentBeanName) {
 		// A quick check for an existing entry upfront, avoiding synchronization...
-		String canonicalName = canonicalName(beanName);
+		// 处理Bean名称，将别名转换为规范的Bean名称
+		String canonicalName = canonicalName(beanName);		
 		Set<String> dependentBeans = this.dependentBeanMap.get(canonicalName);
 		if (dependentBeans != null && dependentBeans.contains(dependentBeanName)) {
 			return;
 		}
 
 		// No entry yet -> fully synchronized manipulation of the dependentBeans Set
-		synchronized (this.dependentBeanMap) {
+		// 先从容器中：Bean名称--->全部依赖Bean名称集合查找给定名称Bean的依赖Bean
+		synchronized (this.dependentBeanMap) {			
+			// 获取给定名称Bean的所有依赖Bean名称
 			dependentBeans = this.dependentBeanMap.get(canonicalName);
 			if (dependentBeans == null) {
+				// 为Bean设置依赖Bean信息
 				dependentBeans = new LinkedHashSet<>(8);
 				this.dependentBeanMap.put(canonicalName, dependentBeans);
 			}
+			// 向容器中：bean名称--->全部依赖Bean名称集合添加Bean的依赖信息
+			// 即：将Bean所依赖的Bean添加到容器的集合中
 			dependentBeans.add(dependentBeanName);
 		}
+		// 先从容器中：bean名称--->指定名称Bean的依赖Bean集合查找给定名称Bean的依赖Bean
 		synchronized (this.dependenciesForBeanMap) {
 			Set<String> dependenciesForBean = this.dependenciesForBeanMap.get(dependentBeanName);
 			if (dependenciesForBean == null) {
 				dependenciesForBean = new LinkedHashSet<>(8);
 				this.dependenciesForBeanMap.put(dependentBeanName, dependenciesForBean);
 			}
+			// 向容器中：bean名称--->指定Bean的依赖Bean名称集合添加Bean的依赖信息
+			// 即：将Bean所依赖的Bean添加到容器的集合中
 			dependenciesForBean.add(canonicalName);
 		}
 	}

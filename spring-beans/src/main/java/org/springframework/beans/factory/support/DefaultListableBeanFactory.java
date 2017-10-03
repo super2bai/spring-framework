@@ -788,6 +788,13 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				|| super.isBeanEligibleForMetadataCaching(beanName));
 	}
 
+	/*
+	 * NOTE 2017-09-30
+	 * 
+	 * Spring IoC容器的lazy-init属性实现预实例化
+	 * 
+	 * 3.对配置lazy-init属性单例Bean的预实例化
+	 */
 	@Override
 	public void preInstantiateSingletons() throws BeansException {
 		if (this.logger.isDebugEnabled()) {
@@ -802,14 +809,22 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
+			// 获取指定名称的Bean定义
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
+			// Bean不是抽象的，是单例模式的，且lazy-init属性配置为false
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				// 如果指定名称的Bean是创建容器的Bean
 				if (isFactoryBean(beanName)) {
+					// BeanFactory中定义：FACTORY_BEAN_PREFIX="&"
+					// 当Bean名称前面加&符号时，获取的是产生容器对象本身，而不是容器产生的Bean
+					// 调用getBean方法，触发容器对Bean实例化和依赖注入过程
 					final FactoryBean<?> factory = (FactoryBean<?>) getBean(
 							FACTORY_BEAN_PREFIX + beanName);
+					// 标识是否需要预实例化
 					boolean isEagerInit;
 					if (System.getSecurityManager() != null
 							&& factory instanceof SmartFactoryBean) {
+						// 匿名内部类
 						isEagerInit = AccessController.doPrivileged(
 								(PrivilegedAction<Boolean>) () -> ((SmartFactoryBean<?>) factory).isEagerInit(),
 								getAccessControlContext());
@@ -819,10 +834,12 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 								&& ((SmartFactoryBean<?>) factory).isEagerInit());
 					}
 					if (isEagerInit) {
+						// 调用getBean方法，触发容器对Bean实例化和依赖注入过程
 						getBean(beanName);
 					}
 				}
 				else {
+					// 调用getBean方法，触发容器对Bean实例化和依赖注入过程
 					getBean(beanName);
 				}
 			}
@@ -922,9 +939,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable
 				// iteration)
-				//注册的过程需要线程同步，以保证数据的一致性
+				// 注册的过程需要线程同步，以保证数据的一致性
 				synchronized (this.beanDefinitionMap) {
-					//按正常注册流程走
+					// 按正常注册流程走
 					this.beanDefinitionMap.put(beanName, beanDefinition);
 					List<String> updatedDefinitions = new ArrayList<>(
 							this.beanDefinitionNames.size() + 1);
@@ -949,7 +966,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		if (oldBeanDefinition != null || containsSingleton(beanName)) {
-			//重置所有已经注册过的BeanDefinition的缓存
+			// 重置所有已经注册过的BeanDefinition的缓存
 			resetBeanDefinition(beanName);
 		}
 	}

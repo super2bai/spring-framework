@@ -112,7 +112,21 @@ final class JdkDynamicAopProxy implements AopProxy, InvocationHandler, Serializa
 	public Object getProxy() {
 		return getProxy(ClassUtils.getDefaultClassLoader());
 	}
-
+	/**
+	 * NOTE
+	 * 2017-10-03
+	 * 
+	 * SpringAOP设计原理及源码分析
+	 * 
+	 * 获取代理类要实现的接口
+	 * 除了Advised对象中配置的
+	 * 还会加上SpringProxy
+	 * Advised(opaque=false)
+	 * 检查上面得到的接口中有没有定义equals或者hashcode的接口
+	 * 调用Proxy.newInstance创建代理对象
+	 * @param classLoader
+	 * @return
+	 */
 	@Override
 	public Object getProxy(@Nullable ClassLoader classLoader) {
 		if (logger.isDebugEnabled()) {
