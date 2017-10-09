@@ -573,15 +573,17 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 
 
 **工作机制**
+
 在容器初始化时会创建所有url和controller的对应关系，保存到Map<url,controller>中
 tomcat启动时会通知Spring初始化容器(加载bean的定义信息和初始化所有单例bean)
 然后SpringMVC会遍历容器中的bean，获取每一个controller中的所有方法访问的url
 然后将url和controller保存到一个map中。
 
-这样就可以根据 request 快速定位到 controller,因为最终处理 request 的是 controller 中的方法,Map 中只保留了 url 和 controller 中的对应关系,所以要根据 request 的 url 进一步确认 controller 中的 method, 这一步工作的原理就是拼接 controller 的 url(controller 上@RequestMapping 的值)和方法的 url(method 上 @RequestMapping 的值),与 request 的 url 进行匹配,找到匹配的那个方法;
-确定处理请求的 method 后,接下来的任务就是参数绑定,把 request 中参数绑定到方法的形式参数上, 这一步是整个请求处理过程中最复杂的一个步骤。springmvc 提供了两种 request 参数与方法形参的绑定 方法:1.通过注解进行绑定,@RequestParam；2.通过参数名称进行绑定.
+这样就可以根据request快速定位到controller,因为最终处理request的是controller中的方法,Map中只保留了url和controller中的对应关系,所以要根据request的 url进一步确认controller中的method, 这一步工作的原理就是拼接controller的url(controller 上@RequestMapping的值)和方法的url(method 上 @RequestMapping 的值),与request的url进行匹配,找到匹配的那个方法;
 
-使用注解进行绑定,我们只要在方法参数前面声明@RequestParam("a"),就可以将 request 中参数 a 的 值绑定到方法的该参数上.使用参数名称进行绑定的前提是必须要获取方法中参数的名称,Java 反射只提 供了获取方法的参数的类型,并没有提供获取参数名称的方法.springmvc 解决这个问题的方法是用 asm 框 架读取字节码文件,来获取方法的参数名称.asm 框架是一个字节码操作框架,关于 asm 更多介绍可以参考 它的官网.个人建议,使用注解来完成参数绑定,这样就可以省去 asm 框架的读取字节码的操作.
+确定处理请求的method后,接下来的任务就是参数绑定,把request中参数绑定到方法的形式参数上, 这一步是整个请求处理过程中最复杂的一个步骤。springmvc 提供了两种 request参数与方法形参的绑定方法:1.通过注解进行绑定,@RequestParam；2.通过参数名称进行绑定.
+
+使用注解进行绑定,我们只要在方法参数前面声明@RequestParam("a"),就可以将request中参数a的值绑定到方法的该参数上.使用参数名称进行绑定的前提是必须要获取方法中参数的名称,Java反射只提供了获取方法的参数的类型,并没有提供获取参数名称的方法.springmvc解决这个问题的方法是用asm框架读取字节码文件,来获取方法的参数名称.asm框架是一个字节码操作框架,关于 asm 更多介绍可以参考它的官网.个人建议,使用注解来完成参数绑定,这样就可以省去asm框架的读取字节码的操作.
 
 **源码分析**
 * 源码分析分为三部分
