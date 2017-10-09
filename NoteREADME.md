@@ -440,10 +440,168 @@ Spring IoC容器的autowire属性自动依赖注入是一个很方便的特性�
 	* Cglib(不是接口)
 具体使用哪种方式由AopProxyFactory根据AdvisedSupport对象的配置来决定。默认的策略是如果目标类是接口，则使用JDkProxy，否则使用Cglib。
 
-* JdkDynamicAopProxy
-
+* 织入代理对象
+InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调用都会委托到InvocationHandler.invoke()方法而通过JdkDynamicAopProxy的签名可以看到这个类其实也实现了InvocationHandler
+		* JdkDynamicAopProxy---invoke
+			* 主入口
+		* AdvisedSupport---getInterceptorsAndDynamicInterceptionAdvice
+			* 获取通知链
+		* AdvisorChainFactory---getInterceptorsAndDynamicInterceptionAdvice
+			* 获取通知链
+		* DefaultAdvisorChainFactory---getInterceptorsAndDynamicInterceptionAdvice
+			* 获取通知链实现
+		* ReflectiveMethodInvocation---proceed()
+			* 触发拦截器链执行
 
 ### 七、Spring JDBC设计原理及二次开发
+* 使用Spring进行基本的JDBC访问数据库有多种选择
+	* JdbcTmplate
+		* 经典的也是最常用的Spring对于JDBC访问的方案
+		* 最低级别的封装
+		* 其他的工作模式底层的实现基础
+		* JDK1.4以上
+		* NamedParameterJdbcTemplate
+			* 封装JdbcTemplate
+			* 提供了更加编辑的基于命名参数的使用方式而不是传统的JDBC所使用的?作为参数的占位符
+	* Spring2.5中新提供的SimpleJdbc类能够更好的处理数据库元数据
+		* SimpleJdbcTemplate
+			* 结合了JdbcTemplate和NamedParameterJdbcTemplate最常用的功能
+			* 利用了Java5的特性所带来的优势
+				* 泛型
+				* varargs
+				* autoboxing
+		* SimpleJdbcInsert & SimpleJdbcCall
+			* 这两个类可以充分利用数据库元数据的特性来简化配置
+			* 可以仅仅提供数据库表明或者存储过程的名称以及一个Map作为参数
+				* Map的key需要与数据库表中的字段保持一致
+			* 通常和SimpleJdbcTemplate配合使用
+			* JDK5
+			* 需要数据库提供足够的元数据信息
+	* RDBMS Object风格的面向对象封装方式，类似于JDo的查询设计
+		* MappingSqlQuery
+		* SqlUpdate and StoreProcedure
+		* 这种方式允许在初始化数据访问层时创建可重用并且线程安全的对象
+			* 该对象在定义了查询语句，声明查询参数并编译相应的Query之后被模型化
+			* 一旦模型化完成，任何执行函数就可以掺入不同的参数进行多次调用
+		* JDK4
+所有的工作模式都必须邀请JDBC2.0以上的数据库驱动的支持，其中一些高级的功能可能需要JDBC3.0以上的数据库驱动支持
+
+**异常处理**
+* SQLExceptionTranslator
+	* 接口
+	* 在SQLException和org.springframework.dao.DataAccessException之间作转换，必须实现该接口
+	* 转换器类的实现可以采用一般通用的做法
+		* JDBC---SQLState code
+		* 定制(精准)
+			* Oracle---error code
+	* 默认实现为SQLErrorCodeSQLExceptionTranslator
+		* 使用指定数据库厂商的error code，比SQLState梗精准
+		* 转换过程基于一个JavaBean（类型为SQLErrorCodes）中的error code
+			* JavaBean由SQLErrorCodesFactory工厂类创建
+				* 其中的内容来自于"sql-error-codes.xml"配置文件
+				* 该文件中的数据库厂商代码基于Database MetaData信息中的DatabaseProductName，从而配合当前数据库的使用
+
+* SQLErrorCodeSQLExceptionTranslator匹配规则
+	* 首先检查是否存在完成定制转换的子类实现
+		* 通常此类可以作为一个具体类使用，不需要进行定制，那么这个规则将不适用
+	* 接着将SQLException的error code与错误代码集中的error code进行匹配
+		* 默认情况下错误代码集将从SQLErrorCodesFactory取得
+		* 错误代码集来自classpath下的sql-error-codes.xml文件
+		* 他们将与数据库metadata信息中的database name进行映射，使用fallback翻译器
+			* SQLStateSQLExceptionTranslator类是缺省的fallback翻译器
+
+**config模块**
+* NamespaceHandler接口
+	* DefalutBeanDefinitionDocumentReader使用该接口来处理在spring.xml配置文件中自定义的命名空间
+	* 在jdbc模块，使用JdbcNamespaceHandler来处理jdbc配置的命名空间 
+* org.w3c.dom软件包(JdbcNamespaceHandler引用）
+		* 为文档对象模型(DOM)提供接口
+		* 该模型是Java API for XMl Processing的组件API
+		* 该Document Object Model Level 2 Core API允许程序动态访问和更新文档的内容和结构
+		* 包下的类
+			* 自行查阅相关文档
+			
+**core模块**
+* JdbcTemplate
+	* core包的核心类
+	* 完成了资源的创建以及释放工作，从而简化了JDBC的使用
+	* 避免一些常见的错误(忘记关闭数据库连接)
+	* 完成JDBC核心处理流程
+		* SQL语句的创建、执行，而把SQL语句的生成以及查询结果的提取工作留给应用代码
+		* 完成SQl查询、更新以及调用存储过程，可以对ResultSet进行遍历并加以提取
+		* 捕获JDBC异常并将其转换为org.springframework.dao包中定义的通用、信息丰富的异常
+	* 使用JdbcTemplate进行编码只需要根据明确定义的一组契约来实现回调接口
+		* PreparedStatementCreator回调接口通过给定的Connection创建一个PreparedStatement，包含SQL和任何相关的参数
+		* CallableStatementCreator实现同样的处理，创建CallableStatement
+		* RowCallbackHandler接口则从数据集的每一行中提取值
+	* 实例化
+		* DAO实现类中通过传递一个DataSource引用来完成
+			* DataSource bean将传递给service
+		* 在Spring的IoC容器中配置一个JdbcTemplate的bean并赋予DAO实现类作为一个实例
+			* DataSource bean将传递给JdbcTemplate bean
+			* 需要注意的是DataSource在Spring的IoC容器中总是配置成一个bean
+		
+* 元数据metaData
+	* CallMetaDataProviderFactory创建 CallMetaDataProvider 的工厂类
+	* TableMetaDataProviderFactory 创建 TableMetaDataProvider 工厂类
+* 使用SqlParameterSource提供参数值
+	* BeanPropertySqlParameterSource
+* DataSource
+	* 获取数据库的连接
+	* jdbc规范的一部分，通过ConnectionFactory获取
+	* 当使用Spring的jdbc层，可以通过JNDI来获取DataSource，也可以配置第三方连接池实现来获取
+		* 第三方实现
+			* apache Jakarta Commons dbcp
+			* c3p0
+	* TransactionAwareDataSourceProxy
+		* 作为目标DataSource的一个代理，在对目标DataSource包装的同时，还增加了Spring的事务管理能力
+		* 该类几乎很少被用到，除非现有代码在被调用的时候需要一个标准的JDBC DataSource接口实现作为参数。在这种情况下，这个类可以使现有代码参与Spring的事务管理。通常最好的做法是使用更高层的抽象来对数据源进行管理，比如JdbcTemplate和DataSourceUtils等
+		
+* Object 模块
+
+
+### Spring MVC框架设计原理
+
+**请求处理流程**
+* DispatcherServlet
+	* 是 springmvc 中的前端控制器(front controller),负责接收 request 并将 request 转发给对应的处理组件.
+* HanlerMapping
+	* 是 springmvc 中完成 url 到 controller 映射的组件.DispatcherServlet 接收 request, 然后从 HandlerMapping 查找处理 request 的 controller
+* Controller
+	* 处理 request,并返回 ModelAndView 对象,Controller 是 springmvc 中负责处理 request 的组件(类似于 struts2 中的 Action),ModelAndView 是封装结果视图的组件.
+* ModelAndView & ViewResolver & View
+	* 视图解析器解析 ModelAndView 对象并返回对应的视图给客户端
+
+
+**工作机制**
+在容器初始化时会创建所有url和controller的对应关系，保存到Map<url,controller>中
+tomcat启动时会通知Spring初始化容器(加载bean的定义信息和初始化所有单例bean)
+然后SpringMVC会遍历容器中的bean，获取每一个controller中的所有方法访问的url
+然后将url和controller保存到一个map中。
+
+这样就可以根据 request 快速定位到 controller,因为最终处理 request 的是 controller 中的方法,Map 中只保留了 url 和 controller 中的对应关系,所以要根据 request 的 url 进一步确认 controller 中的 method, 这一步工作的原理就是拼接 controller 的 url(controller 上@RequestMapping 的值)和方法的 url(method 上 @RequestMapping 的值),与 request 的 url 进行匹配,找到匹配的那个方法;
+确定处理请求的 method 后,接下来的任务就是参数绑定,把 request 中参数绑定到方法的形式参数上, 这一步是整个请求处理过程中最复杂的一个步骤。springmvc 提供了两种 request 参数与方法形参的绑定 方法:1.通过注解进行绑定,@RequestParam；2.通过参数名称进行绑定.
+
+使用注解进行绑定,我们只要在方法参数前面声明@RequestParam("a"),就可以将 request 中参数 a 的 值绑定到方法的该参数上.使用参数名称进行绑定的前提是必须要获取方法中参数的名称,Java 反射只提 供了获取方法的参数的类型,并没有提供获取参数名称的方法.springmvc 解决这个问题的方法是用 asm 框 架读取字节码文件,来获取方法的参数名称.asm 框架是一个字节码操作框架,关于 asm 更多介绍可以参考 它的官网.个人建议,使用注解来完成参数绑定,这样就可以省去 asm 框架的读取字节码的操作.
+
+**源码分析**
+* 源码分析分为三部分
+	* ApplicationContext初始化时建立所有url和controller类的对应关系(用map保存)
+	* 根据请求url找到对应的controller，并从controller中找到处理请求的方法
+	* request参数绑定到方法的形参，执行方法处理请求，并返回结果视图
+
+* 建立Map<urls,controller>的关系
+	* ApplicationObjectSupport---setApplicationContext
+		* 核心为初始化容器initApplicationContext(context)
+			* 子类AbstractDetectingUrlHandlerMapping实现了该方法
+
+
+
+
+
+
+
+
 
 
 
