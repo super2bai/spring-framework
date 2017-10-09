@@ -59,15 +59,14 @@
 
 **IOC容器的创建过程**
 * XmlBeanFactory
-
-
-	//根据 Xml 配置文件创建 Resource 资源对象，该对象中包含了 BeanDefinition 的信息 ClassPathResource resource =new ClassPathResource("application-context.xml");
-	//创建 DefaultListableBeanFactory
-	DefaultListableBeanFactory factory =new DefaultListableBeanFactory();
-	//创建 XmlBeanDefinitionReader 读取器，用于载入 BeanDefinition。之所以需要 BeanFactory 作为参数，是因为会 将读取的信息回调配置给 factory
-	XmlBeanDefinitionReader reader =new XmlBeanDefinitionReader(factory);
-	//XmlBeanDefinitionReader 执行载入 BeanDefinition 的方法，最后会完成 Bean 的载入和注册。完成后 Bean 就成功 的放置到 IOC 容器当中，以后我们就可以从中取得 Bean 来使用
-	reader.loadBeanDefinitions(resource);
+	* 根据Xml配置文件创建Resource资源对象，该对象中包含了BeanDefinition的信息 
+		* ClassPathResource resource =new ClassPathResource("application-context.xml");
+	* 创建DefaultListableBeanFactory
+		* DefaultListableBeanFactory factory =new DefaultListableBeanFactory();
+	* 创建XmlBeanDefinitionReader读取器，用于载入BeanDefinition。之所以需要BeanFactory作为参数，是因为会将读取的信息回调配置给factory
+		 * XmlBeanDefinitionReader reader =new XmlBeanDefinitionReader(factory);
+	* XmlBeanDefinitionReader执行载入BeanDefinition的方法，最后会完成Bean的载入和注册。完成后Bean就成功的放置到IOC容器当中，以后我们就可以从中取得 Bean来使用
+		* reader.loadBeanDefinitions(resource);
 	
 * FileSystemXmlApplicationContext	
 	* 通过调用父类AbstractApplicationContext的refresh()启动整个IoC容器对Bean定义的载入过程
