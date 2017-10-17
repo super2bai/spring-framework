@@ -879,7 +879,7 @@ conn.close();
 		* JTA
 * TransactionStatus
 
-TransactionDefinition--传参到getTransation-->PlatformTransactionManager--getTransaction得到-->TransactionStatus
+`TransactionDefinition`--传参到getTransation-->`PlatformTransactionManager`--getTransaction得到-->`TransactionStatus`
 
 
 
