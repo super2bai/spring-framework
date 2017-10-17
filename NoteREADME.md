@@ -561,7 +561,7 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 
 ### Spring MVC框架设计原理
 
-**请求处理流程**
+**重要概念**
 * DispatcherServlet
 	* 是 springmvc 中的前端控制器(front controller),负责接收 request 并将 request 转发给对应的处理组件.
 	* 扩展了同一个包中的抽象类FrameworkServlet,包含一些解析器的私有静态字段
@@ -618,14 +618,84 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 		* handler mappings处理程序映射
 			* 它们的角色定位与前面所描述的功能完全相同
 			* 它们尝试当前请求与相应的controller以及其中的方法相匹配
+			* 最基本的org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping类
+				* 将URL与相应的bean进行匹配
+				```
+					<bean name="/friends" class"com.2bai.controller.FriendsController" />
+				```
+			* 更灵活的处理映射器org.springframework.web.servlet.handler.SimpleUrlHandleMapping
+				* 可以创建一个映射文件，其中包含URl作为键和controller作为值
+				```
+				<bean id="simpleUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandleMapping">
+					<property name="mappings">
+						<props>
+							<prop key="/friends.html">FriendsControler</props>
+						</props>
+					</property>
+				</bean>
+				```
+				* 处理稍微复杂URL也是一个头疼的问题
+			* DefaultAnnotationHandlerMapping或者在Spring5中使用org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+				* 映射检测是基于注解
+					* @Controller
+					* @RequestMapping
+				* 配置文件中定义<mvc:annotation-driven/>，此处理程序将被激活
+				* 更细粒度的处理cotroller注解
+					* <context:annotation-config/>
+					* <context:component-scan base-package="path.with.my.services.and.controllers"/>
 		* handler adapter处理器适配器
 			* handler adapter从handler mappings中获取映射的controllers和方法并调用它们。
 			* 这种类型的适配器必须实现org.springframework.web.servlet.HandlerAdapter接口，它只有三种方法
 				* supports方法：检查传入参数的对象是否可以由此适配器处理
 				* handle方法：将请求翻译称视图
-				* getLastModified：返回给定HttpServletRequest的最后修改日期，以毫秒为单位						
-
-
+				* getLastModified：返回给定HttpServletRequest的最后修改日期，以毫秒为单位
+	* 版本变化
+		* 3.2废弃,4.x里还可以看到，5已经废弃
+			* DefaultAnnotationHandlerMapping
+			* AnnotationMethodHandlerAdapter
+			* AnnotationMethodHandlerExceptionResolver
+		* 替代品
+			* RequestMappingHandlerMapping
+			* RequestMappingHandlerAdapter
+			* ExceptionHandlerExceptionResolver
+		* 通过这些新类以便于自定义映射。
+		* 通过在Spring3.1版本中org.framework.web.mehthod.HandlerMethod类中引入，来将所处理的对象转换为其方法表示。可以通过这个方法来判断对象返回的类型或者哪些参数是所期望的。
+* 处理程序拦截器
+	* HTTP请求的执行链
+		* DispatcherServlet捕获每个请求。调度员做的第一件事就是将接收到的URl和相应的controller进行映射。在到达对应的controller之前，请求可以被拦截器处理。这些拦截器就像过滤器。只有当URL找到对应于它们的映射时才调用他们。在通过拦截器进行前置处理后，请求最终到达哦controller。之后，发送请求生成视图。但是在这之前，拦截器还是有可能来再次处理它（拦截器后置处理）。只有在最后一次操作之后，视图解析器才能捕获数据并输出视图。
+	* 处理程序映射拦截器基于org.springframework.web.servlet.HandlerInterceptor接口
+		* 方法前使用preHandle
+			* 返回false，则可以在执行链中执行终端请求处理
+			* afterCompletion
+				*  返回true时才会在渲染视图后调用它(完成请求处理后的回调，即渲染视图后)
+		* 方法后使用postHandle
+	* 在新线程中启动
+		* 实现org.framework.web.servlet.AsyncHandlerInterceptor接口，它结成HandlerInterceptor并提供一个方法afterConcurrentHandlingStarted
+			* 每次处理程序得到正确执行时，都会调用此方法而不是调用postHandler()和afterCompletion().
+			* 它也可以对发送请求进行异步处理。
+	* 拦截器和过滤器之间的区别
+		* 作用域
+			* 过滤器
+				* servlet容器下使用
+			* 拦截器
+				* Spring容器中调用
+		* 粒度
+			* 过滤器
+				* 只能在将响应返回给最终用户之前使用
+			* 拦截器
+				* 在controller对请求处理之前或之后被调用
+				* 也可以在将渲染视图呈现给用户之后被调用
+		* 中断链执行的难易成都
+			* 过滤器
+				* 必须处理请求和响应对象来引发中断，需要一些额外的动作，比如将用户重定向到错误页面
+			* 拦截器
+				* 通过在preHandler方法那返回false来简单实现
+	* 默认的Springl拦截器
+		* Spring主要将拦截器用于切换动作。
+			* 区域设置更改
+				* org.springframework.web.servlet.i18n.LocalChangeInterceptor
+				* 可以通过所定义的语言环境解析器来对HTTP请求进行分析来实现
+				* 所有区域设置解析器都会分析请求元素(headers,Cookie)，以确定向用户提供哪种本地化语言设置
 
 
 
