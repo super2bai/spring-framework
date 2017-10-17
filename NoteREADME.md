@@ -681,6 +681,12 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 		* 实现org.framework.web.servlet.AsyncHandlerInterceptor接口，它结成HandlerInterceptor并提供一个方法afterConcurrentHandlingStarted
 			* 每次处理程序得到正确执行时，都会调用此方法而不是调用postHandler()和afterCompletion().
 			* 它也可以对发送请求进行异步处理。
+	* 默认的Springl拦截器
+		* Spring主要将拦截器用于切换动作。
+			* 区域设置更改
+				* org.springframework.web.servlet.i18n.LocalChangeInterceptor
+				* 可以通过所定义的语言环境解析器来对HTTP请求进行分析来实现
+				* 所有区域设置解析器都会分析请求元素(headers,Cookie)，以确定向用户提供哪种本地化语言设置
 	* 拦截器和过滤器之间的区别
 			
 |            | 过滤器                                      | 拦截器                                      |
@@ -689,12 +695,7 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 | 粒度         | 只能在将响应返回给最终用户之前使用                        | 在controller对请求处理之前或之后被调用,也可以在将渲染视图呈现给用户之后被调用 |
 | 中断链执行的难易程度 | 必须处理请求和响应对象来引发中断,需要一些额外的动作，比如将用户重定向到错误页面 | 通过在preHandler方法那返回false来简单实现             |
     
-   * 默认的Springl拦截器
-		* Spring主要将拦截器用于切换动作。
-			* 区域设置更改
-				* org.springframework.web.servlet.i18n.LocalChangeInterceptor
-				* 可以通过所定义的语言环境解析器来对HTTP请求进行分析来实现
-				* 所有区域设置解析器都会分析请求元素(headers,Cookie)，以确定向用户提供哪种本地化语言设置
+   
 
 
 
