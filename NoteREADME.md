@@ -666,6 +666,7 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 			* ExceptionHandlerExceptionResolver
 		* 通过这些新类以便于自定义映射。
 		* 通过在Spring3.1版本中org.framework.web.mehthod.HandlerMethod类中引入，来将所处理的对象转换为其方法表示。可以通过这个方法来判断对象返回的类型或者哪些参数是所期望的。
+
 * 处理程序拦截器
 	* HTTP请求的执行链
 		* DispatcherServlet捕获每个请求。调度员做的第一件事就是将接收到的URl和相应的controller进行映射。在到达对应的controller之前，请求可以被拦截器处理。这些拦截器就像过滤器。只有当URL找到对应于它们的映射时才调用他们。在通过拦截器进行前置处理后，请求最终到达哦controller。之后，发送请求生成视图。但是在这之前，拦截器还是有可能来再次处理它（拦截器后置处理）。只有在最后一次操作之后，视图解析器才能捕获数据并输出视图。
@@ -686,7 +687,6 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 | 作用域        | servlet容器下使用                             | Spring容器中调用                              |
 | 粒度         | 只能在将响应返回给最终用户之前使用                        | 在controller对请求处理之前或之后被调用,也可以在将渲染视图呈现给用户之后被调用 |
 | 中断链执行的难易程度 | 必须处理请求和响应对象来引发中断,需要一些额外的动作，比如将用户重定向到错误页面 | 通过在preHandler方法那返回false来简单实现             |
-    
     
    * 默认的Springl拦截器
 		* Spring主要将拦截器用于切换动作。
