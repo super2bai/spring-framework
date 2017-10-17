@@ -679,7 +679,8 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 		* 实现org.framework.web.servlet.AsyncHandlerInterceptor接口，它结成HandlerInterceptor并提供一个方法afterConcurrentHandlingStarted
 			* 每次处理程序得到正确执行时，都会调用此方法而不是调用postHandler()和afterCompletion().
 			* 它也可以对发送请求进行异步处理。
-	* 拦截器和过滤器之间的区别		
+	* 拦截器和过滤器之间的区别
+			
 |            | 过滤器                                      | 拦截器                                      |
 | ---------- | ---------------------------------------- | ---------------------------------------- |
 | 作用域        | servlet容器下使用                             | Spring容器中调用                              |
