@@ -27,10 +27,10 @@
 * Spring Bean的创建是典型的工厂模式，这一些列的Bean工厂
 * 也即IOC容器为开发者管理对象间的依赖关系提供了很多便利和基础服务
 * BeanFactory作为最顶层的一个接口类,它定义了IOC容器的基本功能规范，子类有：
-	*  ListableBeanFactory(可列表)、
+	*  ListableBeanFactory(可列表)
 	*  HierarchicalBeanFactory(有继承关系)
 	*  AutowaireCapableBeanFactory(定义Bean的自动装配规则)
-* 最终实现是DefaultListableBeanFactory
+	* 最终实现是DefaultListableBeanFactory
 * 这四个接口共同定义了Bean的集合、之间的关系和行为
 * 如何生产对象，要看IOC容器的实现
 	* XmlBeanFactory
@@ -51,22 +51,32 @@
 	
 ### 三、IoC容器的初始化
 **IOC容器的初始化**
-* BeanDefinition的Resource定位
-* BeanDefinition的Resource载入
-* BeanDefinition的Resource注册
+* BeanDefinition的Resource
+	* 定位
+	* 载入
+	* 注册
 > ApplicationContext允许上下文嵌套，通过保持父上下文可以维持一个上下文体系。对于bean的查找可以在这个上下文体系中发生，首先检查当前上下文，其次是父上下文，逐级向上，这样为不同的Spring应用提供了一个共享的bean定义环境。
 
 
 **IOC容器的创建过程**
 * XmlBeanFactory
-	* 根据Xml配置文件创建Resource资源对象，该对象中包含了BeanDefinition的信息 
-		* ClassPathResource resource =new ClassPathResource("application-context.xml");
-	* 创建DefaultListableBeanFactory
-		* DefaultListableBeanFactory factory =new DefaultListableBeanFactory();
-	* 创建XmlBeanDefinitionReader读取器，用于载入BeanDefinition。之所以需要BeanFactory作为参数，是因为会将读取的信息回调配置给factory
-		 * XmlBeanDefinitionReader reader =new XmlBeanDefinitionReader(factory);
-	* XmlBeanDefinitionReader执行载入BeanDefinition的方法，最后会完成Bean的载入和注册。完成后Bean就成功的放置到IOC容器当中，以后我们就可以从中取得 Bean来使用
-		* reader.loadBeanDefinitions(resource);
+	 
+```Java
+//根据Xml配置文件创建Resource资源对象，该对象中包含了BeanDefinition的信息
+ClassPathResource resource =new ClassPathResource("application-context.xml");
+
+//创建DefaultListableBeanFactory
+DefaultListableBeanFactory factory =new DefaultListableBeanFactory();
+
+//创建XmlBeanDefinitionReader读取器，用于载入BeanDefinition。
+//之所以需要BeanFactory作为参数，是因为会将读取的信息回调配置给factory
+
+XmlBeanDefinitionReader reader =new XmlBeanDefinitionReader(factory);
+
+//XmlBeanDefinitionReader执行载入BeanDefinition的方法，最后会完成Bean的载入和注册。
+//完成后Bean就成功的放置到IOC容器当中，以后我们就可以从中取得 Bean来使用
+reader.loadBeanDefinitions(resource);
+```
 	
 * FileSystemXmlApplicationContext	
 	* 通过调用父类AbstractApplicationContext的refresh()启动整个IoC容器对Bean定义的载入过程
@@ -83,7 +93,7 @@
 		* DefaultDocumentLoader的loadDocument方法
 		* 该解析过程调用JavaEE标准的JAXP标准进行处理
 		
-至此，Sping IOC容器根据定位的Bean定义资源文件，将其加载读入并转换成为Document对象过程完成。
+> 至此，Sping IOC容器根据定位的Bean定义资源文件，将其加载读入并转换成为Document对象过程完成。
 接下来要继续分析Spring IOC容器将载入的Bean定义资源文件转换为Document对象之后，是如何将其解析为Spring IOC管理的Bean对象并将其注册到容器中的
 
 **XmlBeanDefinitionReader解析载入Bean定义资源文件**
@@ -121,11 +131,11 @@
 **解析list元素的子元素**
 * BeanDefinitionParserDelegate---parseListElement
 
-经过对Spring Bean定义资源文件转换的Document对象中的元素层层解析，Spring IoC现在已经将XML性质定义的Bean定义资源文件转换为Spring IoC所识别的数据结构---BeanDefinition，它是Bean定义资源文件中配置POJO对象在Spring IoC容器中的映射，可以通过AbstractBeanDefinition为入口，看到了IoC容器进行索引、查询和操作
+>经过对Spring Bean定义资源文件转换的Document对象中的元素层层解析，Spring IoC现在已经将XML性质定义的Bean定义资源文件转换为Spring IoC所识别的数据结构---BeanDefinition，它是Bean定义资源文件中配置POJO对象在Spring IoC容器中的映射，可以通过AbstractBeanDefinition为入口，看到了IoC容器进行索引、查询和操作.
 
-通过Spring IoC容器对Bean定义资源的解析后，IoC容器大致完成了管理Bean对象的准备工作，即初始化过程，但是最为重要的依赖注入还没有发生，现在在IoC容器中BeanDefinition存储的只是一些静态信息，接下来需要向同期注册Bean定义信息才能全部完成IoC容器的初始化过程。
+>通过Spring IoC容器对Bean定义资源的解析后，IoC容器大致完成了管理Bean对象的准备工作，即初始化过程，但是最为重要的依赖注入还没有发生，现在在IoC容器中BeanDefinition存储的只是一些静态信息，接下来需要向同期注册Bean定义信息才能全部完成IoC容器的初始化过程。
 
-继续跟踪程序的执行顺序，接下来会到分析DefaultBeanDefinitionDocumentReader对Bean定义转换的Document对象解析的流程中，在其parseDefaultElement方法中完成对Document对象的解析后得到BeanDefinition的BeanDefinitionHolder对象，然后在processBeanDefinition方法里调用BeanDefinitionReaderUtils的registerBeanDefinition向IoC容器注册解析的Bean。
+>继续跟踪程序的执行顺序，接下来会到分析DefaultBeanDefinitionDocumentReader对Bean定义转换的Document对象解析的流程中，在其parseDefaultElement方法中完成对Document对象的解析后得到BeanDefinition的BeanDefinitionHolder对象，然后在processBeanDefinition方法里调用BeanDefinitionReaderUtils的registerBeanDefinition向IoC容器注册解析的Bean。
 
 **解析过后的BeanDefinition在IoC容器中的注册**
 * BeanDefinitionReaderUtils---registerBeanDefinition
@@ -136,7 +146,7 @@
 * 使用一个HashMap的集合对象存放IoC容器中注册解析的BeanDefinitio，向容器注册的主要源码
 * registerBeanDefinition方法向IoC容器注册
 
-至此，Bean定义资源文件中配置的Bean被解析过后，已经注册到IoC容器中，被容器管理起来，真正完成了IoC容器初始化所做的全部工作。现在IoC容器中已经建立了整个Bean的配置信息，这些BeanDefinition信息已经可以使用，并且可以被检索，IoC容器的作用就是对这些注册的Bean定义信息进行处理和维护。这些注册的Bean定义信息是IoC容器控制反转的基础，正是有了这些注册的数据，容器才可以进行依赖注入。
+> 至此，Bean定义资源文件中配置的Bean被解析过后，已经注册到IoC容器中，被容器管理起来，真正完成了IoC容器初始化所做的全部工作。现在IoC容器中已经建立了整个Bean的配置信息，这些BeanDefinition信息已经可以使用，并且可以被检索，IoC容器的作用就是对这些注册的Bean定义信息进行处理和维护。这些注册的Bean定义信息是IoC容器控制反转的基础，正是有了这些注册的数据，容器才可以进行依赖注入。
 
 <hr>
 
@@ -169,7 +179,7 @@
 当Spring IoC容器完成了Bean定义资源的定位、载入和解析注册以后，IoC容器中已经管理类Bean定义的相关数据，但是此时IoC容器还没有对所管理的Bean进行依赖注入，依赖注入在以下两种情况发生：
 * 用户第一次通过getBean方法向IoC容器获取Bean时，IoC容器触发依赖注入
 * 当用户在Bean定义资源中为<Bean>元素配置了lazy-init属性，即让容器在解析注册Beean定义时进行预实例化，触发依赖注入。
-BeanFactory接口定义了Spring IoC容器的基本功能规范。BeanFactory接口定义了几个getBean方法，就是用户向IoC容器索取管理的Bean的方法。具体实现在AbstractBeanFactory中。
+> BeanFactory接口定义了Spring IoC容器的基本功能规范。BeanFactory接口定义了几个getBean方法，就是用户向IoC容器索取管理的Bean的方法。具体实现在AbstractBeanFactory中。
 
 **AbstractBeanFactory通过getBean向IoC容器获取被管理的Bean**
 * AbstractBeanFactory---doGetBean
@@ -183,7 +193,7 @@ BeanFactory接口定义了Spring IoC容器的基本功能规范。BeanFactory接
 * 其他
 	* 扩展为指定其生命周期范围
 	
-具体的Bean实例对象的创建过程由实现了ObjectFactory接口的匿名内部类的createBean方法完成。ObjectFactory使用了委派模式，具体的Bean实例创建过程交由其实现类AbstractAutowireCapableBeanFactory完成。
+> 具体的Bean实例对象的创建过程由实现了ObjectFactory接口的匿名内部类的createBean方法完成。ObjectFactory使用了委派模式，具体的Bean实例创建过程交由其实现类AbstractAutowireCapableBeanFactory完成。
 	
 **AbstractAutowireCapableBeanFactory创建Bean实例对象**
 
@@ -226,14 +236,15 @@ AbstractAutowireCapableBeanFactory类实现了ObjectFactoryj接口，创建容�
 
 **BeanDefinitionValueResolver解析属性值**
 
-当容器在对属性进行依赖注入时，如果发现属性值需要进行类型转换，如属性值是容器中另一个Bean实例对象的引用，则容器首先需要根据属性值解析出所医用的对象，然后才能将该引用对象注入到目标实例对象的属性上去，对属性进行解析的由resolveValueIfNecessary方法实现
+> 当容器在对属性进行依赖注入时，如果发现属性值需要进行类型转换，如属性值是容器中另一个Bean实例对象的引用，则容器首先需要根据属性值解析出所医用的对象，然后才能将该引用对象注入到目标实例对象的属性上去，对属性进行解析的由resolveValueIfNecessary方法实现
+
 * BeanDefinitionValueResolver---resolveValueIfNecessary
 * BeanDefinitionValueResolver---resolveReference
 * BeanDefinitionValueResolver---resolveManagedArray
 * BeanDefinitionValueResolver---resolveManagedList
 * BeanDefinitionValueResolver---resolveManagedSet
 * BeanDefinitionValueResolver---resolveManagedMap
-通过上面的代码分析，明白了Spring是如何将引用类型，内部类以及集合类型等属性进行解析的，属性值解析完成后就可以进行依赖注入了，依赖注入的过程就是Bean对象实例设置到它所依赖的Bean对象舒心上去，依赖注入是通过bw.setPropertyValues方法实现的，该方法也使用了委托模式，在BeanWrapper接口中至少定义了方法声明，依赖注入的具体实现交由其实现类BeanWrapperImpl来完成。
+> 通过上面的代码分析，明白了Spring是如何将引用类型，内部类以及集合类型等属性进行解析的，属性值解析完成后就可以进行依赖注入了，依赖注入的过程就是Bean对象实例设置到它所依赖的Bean对象舒心上去，依赖注入是通过bw.setPropertyValues方法实现的，该方法也使用了委托模式，在BeanWrapper接口中至少定义了方法声明，依赖注入的具体实现交由其实现类BeanWrapperImpl来完成。
 
 **BeanWrapperImpl对Bean属性的依赖注入**
 
@@ -249,93 +260,98 @@ BeanWrapperImpl类主要是对容器中完成初始化的Bean实例对象进行�
 至此Spring IoC容器对Bean定义资源文件的定位，载入、解析和依赖注入已经全部分析完毕，现在Spring IoC容器中管理了一系列靠依赖关系联系起来的Bean，程序不需要应用自己手动创建所需的对象，Spring IoC容器会在使用的时候自动创建，并且注入好相关的依赖，这就是Spring核心功能的控制反转和依赖注入的相关功能
 
 ### 五、IoC容器的高级特性
-* 介绍
+
+**介绍**
+
 之前介绍了Spring Ioc容器对Bean资源的定位，读取和解析过程，同时也清楚了当用户通过getBean方向向IoC容器获取被管理的Bean时，IoC容器对Bean进行的初始化和依赖注入的过程，这些是Spring IoC容器的基本功能特性。
 
 Spring IoC还有一些高级特性，如使用lazy-init属性对Bean预初始化、FactoryBean产生或者修饰Bean对象的生成、IoC容器初始化Bean过程中使用BeanPostProcessor后置处理器对Bean生命周期事件管理和IoC容器的autowiring自动装配功能等。
 
-* Spring IoC容器的lazy-init属性实现预实例化
-通过前面对IoC容器的实现和工作原理分析，知道了IoC容器的初始化过程就是对Bean定义资源的定位、载入和注册，此时容器对Bean的依赖注入并没有发生，依赖注入主要是在应用程序第一次向容器索取Bean时，通过getBean方法的调用完成。
+**Spring IoC容器的lazy-init属性实现预实例化**
 
-当Bean定义资源的 Bean元素中配置了lazy-init属性时，容器将会在初始化的时候对所配置的Bean进行预实例化，Bean的依赖注入在容器初始化的时候已经完成。这样，当应用程序第一次向容器索取被管理的Bean时，就不用再初始化和对Bean进行依赖注入了，直接从容器中获取已经完成依赖注入的现成的Bean，可以提高应用第一次向容器获取Bean的性能。
-	* refresh
-		* AbstractApplicationContext---refresh()
-		* 先从IoC容器的初始化过程开始，通过之前的分析，知道IoC容器读入已经定位的Bean定义资源是从refresh方法开始的。
-	* finishBeanFactoryInitialization处理预实例化Bean
-		* AbstractApplicationContext---finishBeanFactoryInitialization
-	* DefaultListableBeanFactory 对配置 lazy-init 属性单态 Bean 的预实例化
-		* DefaultListableBeanFactory---preInstantiateSingletons
-		* 如果设置了lazy-init属性，则容器在完成Bean定义的注册之后，会通过getBean方法，触发对指定Bean的初始化和依赖注入过程，这样当应用第一次向容器索取所需的Bean时，ring 起不再需要对Bean进行初始化和依赖注入，直接从已经完成实例化和依赖注入的Bean中取一个现成的Bean，这样就提高了第一次获取Bean的性能。
+> 通过前面对IoC容器的实现和工作原理分析，知道了IoC容器的初始化过程就是对Bean定义资源的定位、载入和注册，此时容器对Bean的依赖注入并没有发生，依赖注入主要是在应用程序第一次向容器索取Bean时，通过getBean方法的调用完成。当Bean定义资源的 Bean元素中配置了lazy-init属性时，容器将会在初始化的时候对所配置的Bean进行预实例化，Bean的依赖注入在容器初始化的时候已经完成。这样，当应用程序第一次向容器索取被管理的Bean时，就不用再初始化和对Bean进行依赖注入了，直接从容器中获取已经完成依赖注入的现成的Bean，可以提高应用第一次向容器获取Bean的性能。
+* refresh
+	* AbstractApplicationContext---refresh()
+	* 先从IoC容器的初始化过程开始，通过之前的分析，知道IoC容器读入已经定位的Bean定义资源是从refresh方法开始的。
+* finishBeanFactoryInitialization处理预实例化Bean
+	* AbstractApplicationContext---finishBeanFactoryInitialization
+* DefaultListableBeanFactory 对配置 lazy-init 属性单态 Bean 的预实例化
+	* DefaultListableBeanFactory---preInstantiateSingletons
+	* 如果设置了lazy-init属性，则容器在完成Bean定义的注册之后，会通过getBean方法，触发对指定Bean的初始化和依赖注入过程，这样当应用第一次向容器索取所需的Bean时，ring 起不再需要对Bean进行初始化和依赖注入，直接从已经完成实例化和依赖注入的Bean中取一个现成的Bean，这样就提高了第一次获取Bean的性能。
+	
+**FactoryBean的实现**
 
-* FactoryBean的实现
-	* 背景知识
-		* BeanFactory
-			* Bean工厂，是一个工厂
-			* Spring IoC容器的最顶层接口
-			*  管理Bean
-				* 实例化、定位、配置应用程序中的对象及建立这些对象见的依赖
-		* FactoryBean
-			* 工厂Bean，是一个Bean
-			* 产生其他Bean实例
-			* 通常情况下，这种bean没有什么特别的要求，仅需要提供一个工厂方法，该方法用来返回其他bean实例
-			* 通常情况下，bean无需自己实现工厂模式，Spring容器担任工厂角色
-			* 少数情况下，容器中的bean本身就是工厂，其作用是产生其他bean实例
-	当用户使用容器本身时，可以使用转义字符“&”来得到Factory本身，以区别通过FactoryBean产生的实例对象和FactoryBean对象本身。
-		如果myJndiObject是一个FactoryBean，使用&myJndiObject得到的是myJndiObject对象，而不是myJndiObject产生出来的对象。 
+* 背景知识
+	* BeanFactory
+		* Bean工厂，是一个工厂
+		* Spring IoC容器的最顶层接口
+		*  管理Bean
+			* 实例化、定位、配置应用程序中的对象及建立这些对象见的依赖
 	* FactoryBean
-	* AbstractBeanFactory---doGetBean
-		* 调用FactoryBean			
-		* AbstractBeanFactory---getObjectForBeanInstance
-			* Dereference（解引用）
-			* 在C/C++中应用比较多的术语，"*"是解引用符号，而"&"是引用符号
-			* 解引用是指变量指向的是所引用对象的本身数据，而不是引用对象的内存地址
-	* AbstractBeanFactory生产Bean实例对象
-		* FactoryBeanRegistrySupport---getObjectFromFactoryBean
-		* FactoryBeanRegistrySupport---doGetObjectFromFactoryBean
-		* BeanFactory接口调用其实现类的getObject方法来实现创建Bean实例对象的功能	
-	* 工厂Bean的实现类getObject方法创建Bean实例对象
-		* FactoryBean的实现类非常多
-			* Proxy
-			* RMI
-			* JNDI
-			* ServletContextFactoryBean
-			* ...
-		* FactoryBean接口为Spring容器提供了一个很好的封装机制，具体的getObject有不同的实现类根据不同的实现政策来具体技工，分析一个最简单的AnnotationTestBeanFactory
-			* AnnotationTestBeanFactory
-			* 其他的Proxy、RMI、JNDI等等，都是根据相应的策略提供getObject的实现
+		* 工厂Bean，是一个Bean
+		* 产生其他Bean实例
+		* 通常情况下，这种bean没有什么特别的要求，仅需要提供一个工厂方法，该方法用来返回其他bean实例
+		* 通常情况下，bean无需自己实现工厂模式，Spring容器担任工厂角色
+		* 少数情况下，容器中的bean本身就是工厂，其作用是产生其他bean实例
+当用户使用容器本身时，可以使用转义字符“&”来得到Factory本身，以区别通过FactoryBean产生的实例对象和FactoryBean对象本身。
+	如果myJndiObject是一个FactoryBean，使用&myJndiObject得到的是myJndiObject对象，而不是myJndiObject产生出来的对象。 
+* FactoryBean
+* AbstractBeanFactory---doGetBean
+	* 调用FactoryBean			
+	* AbstractBeanFactory---getObjectForBeanInstance
+		* Dereference（解引用）
+		* 在C/C++中应用比较多的术语，"*"是解引用符号，而"&"是引用符号
+		* 解引用是指变量指向的是所引用对象的本身数据，而不是引用对象的内存地址
+* AbstractBeanFactory生产Bean实例对象
+	* FactoryBeanRegistrySupport---getObjectFromFactoryBean
+	* FactoryBeanRegistrySupport---doGetObjectFromFactoryBean
+	* BeanFactory接口调用其实现类的getObject方法来实现创建Bean实例对象的功能	
+* 工厂Bean的实现类getObject方法创建Bean实例对象
+	* FactoryBean的实现类非常多
+		* Proxy
+		* RMI
+		* JNDI
+		* ServletContextFactoryBean
+		* ...
+	* FactoryBean接口为Spring容器提供了一个很好的封装机制，具体的getObject有不同的实现类根据不同的实现政策来具体技工，分析一个最简单的AnnotationTestBeanFactory
+		* AnnotationTestBeanFactory
+		* 其他的Proxy、RMI、JNDI等等，都是根据相应的策略提供getObject的实现
 
-* BeanPostProcessor后置处理器的实现
-BeanPostProcessor后置处理器是Spring IoC容器经常使用到的一个特性，这个Bean后置处理器是一个监听器，可以监听容器触发的Bean生命周期事件。后置处理器向容器注册以后，容器中管理的Bean就具备了接收IoC容器事件回调的能力。
-BeanPostProcessor的使用非常简单，只需要提供一个实现接口BeanPostProcessor的实现类，然后在Bean的配置文件中设置即可。
-	* BeanPostProcessor
-		* 这两个回调的入口都是和容器管理的Bean的生命周期事件紧密相关，可以为用户提供在Spring IoC容器初始化Bean过程中自定义的处理操作
-	* AbstractAutowireCapableBeanFactory类对容器生成的Bean添加后置处理器
-		* AbstractAutowireCapableBeanFactory---doCreateBean
-			* BeanPostProcessor后置处理器的调用发生在Spring IoC容器完成对Bean实例对象的创建和属性的依赖注入完成之后，当应用程序第一次调用getBean方法（lazy-init预实例化除外）向Spring IoC容器索取指定Bean时触发Spring IoC容器创建Bean实例对象并进行依赖注入的过程，其中真正实现创建Bean对象并进行依赖注入的方法是AbstractAutowireCapableBeanFactory类的doCreateBean
-	* AbstractAutowireCapableBeanFactory---initializeBean
-		* 为容器产生的Bean实例对象添加BeanPostProcessor后置处理器的入口
-		* AbstractAutowireCapableBeanFactory---applyBeanPostProcessorsAfterInitialization
-			* BeanPostProcessor是一个接口，其初始化前的操作方法和初始化后的操作放啊均委托其实现子类来实现
-				* AOP面向切面编程的注册通知适配器
-				* Bean对象的数据校验
-				* Bean继承属性/方法的合并
-	* AdvisorAdapterRegistrationManager 
-		* 其他的BeanPostProcessor接口实现类也类似，都是对Bean对象使用到的一些特性进行处理，或者向IoC容器中注册，为创建的Bean实例对象做一些自定义的功能增加，这些操作是容器初始化Bean时自动触发的，不需要人为的干预
+**BeanPostProcessor后置处理器的实现**
+
+>BeanPostProcessor后置处理器是Spring IoC容器经常使用到的一个特性，这个Bean后置处理器是一个监听器，可以监听容器触发的Bean生命周期事件。后置处理器向容器注册以后，容器中管理的Bean就具备了接收IoC容器事件回调的能力。
+
+>BeanPostProcessor的使用非常简单，只需要提供一个实现接口BeanPostProcessor的实现类，然后在Bean的配置文件中设置即可。
+* BeanPostProcessor
+	* 这两个回调的入口都是和容器管理的Bean的生命周期事件紧密相关，可以为用户提供在Spring IoC容器初始化Bean过程中自定义的处理操作
+* AbstractAutowireCapableBeanFactory类对容器生成的Bean添加后置处理器
+	* AbstractAutowireCapableBeanFactory---doCreateBean
+		* BeanPostProcessor后置处理器的调用发生在Spring IoC容器完成对Bean实例对象的创建和属性的依赖注入完成之后，当应用程序第一次调用getBean方法（lazy-init预实例化除外）向Spring IoC容器索取指定Bean时触发Spring IoC容器创建Bean实例对象并进行依赖注入的过程，其中真正实现创建Bean对象并进行依赖注入的方法是AbstractAutowireCapableBeanFactory类的doCreateBean
+* AbstractAutowireCapableBeanFactory---initializeBean
+	* 为容器产生的Bean实例对象添加BeanPostProcessor后置处理器的入口
+	* AbstractAutowireCapableBeanFactory---applyBeanPostProcessorsAfterInitialization
+		* BeanPostProcessor是一个接口，其初始化前的操作方法和初始化后的操作放啊均委托其实现子类来实现
+			* AOP面向切面编程的注册通知适配器
+			* Bean对象的数据校验
+			* Bean继承属性/方法的合并
+* AdvisorAdapterRegistrationManager 
+	* 其他的BeanPostProcessor接口实现类也类似，都是对Bean对象使用到的一些特性进行处理，或者向IoC容器中注册，为创建的Bean实例对象做一些自定义的功能增加，这些操作是容器初始化Bean时自动触发的，不需要人为的干预
 			
-* Spring IoC容器autowiring实现原理
-	* Spring IoC容器提供了两种管理Bean依赖关系的方式
-		* 显式管理
-			* 通过BeanDefinition的属性值和构造方法实现Bean依赖关系管理
-		* autowiring
-			* Spring IoC容器的依赖自动装配功能，不需要对Bean属性的依赖关系做显式的声明，只需要在配置好autowiring属性，IoC容器会自动使用反射查找属性的类型和名称，然后基于属性的类型或者名称来自动装配容器中管理的Bean，从而自动的完成依赖注入
-	* AbstractAutoWireCapableBeanFactory对Bean实例进行属性依赖注入
-		* AbstractAutoWireCapableBeanFactory---populateBean
-	* Spring IoC容器根据Bean名称或者类型进行autowiring自动依赖注入
-		* AbstractAutoWireCapableBeanFactory---autowireByName
-		* AbstractAutoWireCapableBeanFactory---autowireByType
-		* 可以看出来通过属性名进行自动依赖注入的相对比通过属性类型进行自动依赖注入要稍微简单一些，但是真正实现属性注入的是DefaultSingletonBeanRegistry类的registerDependentBean
-	* DefaultSingletonBeanRegistry的registerDependentBean方法对属性注入
-		* DefaultSingletonBeanRegistry---registerDependentBean
+**Spring IoC容器autowiring实现原理**
+* Spring IoC容器提供了两种管理Bean依赖关系的方式
+	* 显式管理
+		* 通过BeanDefinition的属性值和构造方法实现Bean依赖关系管理
+	* autowiring
+		* Spring IoC容器的依赖自动装配功能，不需要对Bean属性的依赖关系做显式的声明，只需要在配置好autowiring属性，IoC容器会自动使用反射查找属性的类型和名称，然后基于属性的类型或者名称来自动装配容器中管理的Bean，从而自动的完成依赖注入
+* AbstractAutoWireCapableBeanFactory对Bean实例进行属性依赖注入
+	* AbstractAutoWireCapableBeanFactory---populateBean
+* Spring IoC容器根据Bean名称或者类型进行autowiring自动依赖注入
+	* AbstractAutoWireCapableBeanFactory---autowireByName
+	* AbstractAutoWireCapableBeanFactory---autowireByType
+	* 可以看出来通过属性名进行自动依赖注入的相对比通过属性类型进行自动依赖注入要稍微简单一些，但是真正实现属性注入的是DefaultSingletonBeanRegistry类的registerDependentBean
+* DefaultSingletonBeanRegistry的registerDependentBean方法对属性注入
+	* DefaultSingletonBeanRegistry---registerDependentBean
+		
 通过对autowire的源码分析，可以看出，autowire的实现过程：
 * 对Bean的属性调用getBean方法，完成依赖Bean的初始化和依赖注入
 * 将依赖Bean的属性引用设置到被依赖的Bean上
@@ -565,7 +581,7 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 * Object 模块
 
 
-### Spring MVC框架设计原理
+### 八、Spring MVC框架设计原理
 
 **DispatcherServlet**
 
@@ -748,7 +764,7 @@ tomcat启动时会通知Spring初始化容器(加载bean的定义信息和初始
 * SpringMVC并没有对处理url的方法进行缓存，也就是说每次都要根据请求url去匹配controller中的方法url。如果把url和method的关系缓存起来，会不会带来性能上的提升呢？但是！负责解析url和method对应关系的ServletHandlerMethodResolver是一个private的内部类，不能直接继承该类增强代码，必须要改代码后重新编译。当然，如果缓存起来，必须要考虑缓存的线程安全问题。
 
 
-### Spring事务原理详解
+### 九、Spring事务原理详解
 **什么是事务Transaction**
 
 * 是访问并可能更新数据库中各种数据项的一个程序执行单元。
@@ -866,7 +882,7 @@ conn.close();
 另外三种事务传播属性基本用不到，在此不做分析。
 
 
-### Spring事务源码分析
+### 十、Spring事务源码分析
 * TransactionDefinition
 * PlatformTransactionManager
 	* DataSourceTransactionManager
