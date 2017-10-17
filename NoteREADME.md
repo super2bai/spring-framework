@@ -322,6 +322,7 @@ Spring IoC还有一些高级特性，如使用lazy-init属性对Bean预初始化
 >BeanPostProcessor后置处理器是Spring IoC容器经常使用到的一个特性，这个Bean后置处理器是一个监听器，可以监听容器触发的Bean生命周期事件。后置处理器向容器注册以后，容器中管理的Bean就具备了接收IoC容器事件回调的能力。
 
 >BeanPostProcessor的使用非常简单，只需要提供一个实现接口BeanPostProcessor的实现类，然后在Bean的配置文件中设置即可。
+
 * BeanPostProcessor
 	* 这两个回调的入口都是和容器管理的Bean的生命周期事件紧密相关，可以为用户提供在Spring IoC容器初始化Bean过程中自定义的处理操作
 * AbstractAutowireCapableBeanFactory类对容器生成的Bean添加后置处理器
