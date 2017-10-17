@@ -53,6 +53,21 @@ public class BeanNameUrlHandlerMapping extends AbstractDetectingUrlHandlerMappin
 	/**
 	 * Checks name and aliases of the given bean for URLs, starting with "/".
 	 */
+	/**
+	 * NOTE
+	 * 201-10-12
+	 * 建立Map<urls,controller>的关系
+	 * 
+	 * 获取controller中所有的url
+	 * @param context
+	 * @throws BeansException
+	 * 
+	 * 查找beanName上所有url
+	 * URL到bean的映射
+	 * 
+	 * url：/foo
+	 * 会映射到handler ：/foo
+	 */
 	@Override
 	protected String[] determineUrlsForHandler(String beanName) {
 		List<String> urls = new ArrayList<>();
@@ -65,6 +80,7 @@ public class BeanNameUrlHandlerMapping extends AbstractDetectingUrlHandlerMappin
 				urls.add(alias);
 			}
 		}
+		//以数组形式返回
 		return StringUtils.toStringArray(urls);
 	}
 

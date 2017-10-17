@@ -49,6 +49,15 @@ import org.springframework.util.Assert;
  * @see org.springframework.transaction.jta.JtaTransactionManager
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
  */
+/**
+ * NOTE
+ * 2017-10-09
+ * 用来对数据库连接进行管理的主要工具
+ * 比如打开和关闭数据库连接等基本操作
+ * 
+ * @author 2bai
+ * @since 5.0
+ */
 public abstract class DataSourceUtils {
 
 	/**

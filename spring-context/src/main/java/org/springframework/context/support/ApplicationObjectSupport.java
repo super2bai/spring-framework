@@ -59,7 +59,15 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
 	@Nullable
 	private MessageSourceAccessor messageSourceAccessor;
 
-
+	/**
+	 * NOTE
+	 * 201-10-12
+	 * 建立Map<urls,controller>的关系
+	 * 
+	 * 核心部分为初始化容器initApplicationContext
+	 * @param context
+	 * @throws BeansException
+	 */
 	@Override
 	public final void setApplicationContext(@Nullable ApplicationContext context) throws BeansException {
 		if (context == null && !isContextRequired()) {
@@ -131,6 +139,15 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
 	 * @throws ApplicationContextException in case of initialization errors
 	 * @throws BeansException if thrown by ApplicationContext methods
 	 * @see #setApplicationContext
+	 */
+	/**
+	 * NOTE
+	 * 201-10-12
+	 * 建立Map<urls,controller>的关系
+	 * 
+	 * AbstractDetectingUrlHandlerMapping实现了该方法
+	 * @param context
+	 * @throws BeansException
 	 */
 	protected void initApplicationContext() throws BeansException {
 	}

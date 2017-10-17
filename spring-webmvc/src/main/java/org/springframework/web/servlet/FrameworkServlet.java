@@ -134,6 +134,20 @@ import org.springframework.web.util.WebUtils;
  * @see #setContextInitializerClasses
  * @see #setNamespace
  */
+/**
+ * NOTE
+ * 2017-10-16
+ * 
+ * 请求预处理
+ * 抽象类FrameworkServlet--->HttpServletBean--->HttpServlet
+ * 
+ * HttpServlet是一个抽象类，其方法定义主要用来处理每种类型的HTTP请求(GET/POT/PUT/DELETE/TRACE/HEAD/OPTIONS)
+ * 
+ * FrameworkServlet通过将每个传入的请求调度到processRequest来覆盖他们。
+ * 
+ * @author 2bai
+ * @since 5.0
+ */
 @SuppressWarnings("serial")
 public abstract class FrameworkServlet extends HttpServletBean implements ApplicationContextAware {
 
@@ -956,6 +970,13 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * Process this request, publishing an event regardless of the outcome.
 	 * <p>The actual event handling is performed by the abstract
 	 * {@link #doService} template method.
+	 */
+	/**
+	 * NOTE
+	 * 2017-10-16
+	 * 
+	 * 构造出LocaleContext和ServletRequestAttributes
+	 * 两者都可以在initContextHolders之后访问
 	 */
 	protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

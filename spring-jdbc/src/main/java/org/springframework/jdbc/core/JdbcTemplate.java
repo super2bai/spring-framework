@@ -365,19 +365,23 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 	@Nullable
 	public <T> T execute(StatementCallback<T> action) throws DataAccessException {
 		Assert.notNull(action, "Callback object must not be null");
-
+		// 创建数据库连接
 		Connection con = DataSourceUtils.getConnection(obtainDataSource());
 		Statement stmt = null;
 		try {
 			stmt = con.createStatement();
+			// 应用用户输入的参数
 			applyStatementSettings(stmt);
+			// 回调QueryStatementCallback的doInStatement方法
 			T result = action.doInStatement(stmt);
+			// 警告处理
 			handleWarnings(stmt);
 			return result;
 		}
 		catch (SQLException ex) {
 			// Release Connection early, to avoid potential connection pool deadlock
 			// in the case when the exception translator hasn't been initialized yet.
+			// 发生异常时释放资源
 			JdbcUtils.closeStatement(stmt);
 			stmt = null;
 			DataSourceUtils.releaseConnection(con, getDataSource());
@@ -385,7 +389,9 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 			throw getExceptionTranslator().translate("StatementCallback", getSql(action), ex);
 		}
 		finally {
+			// 释放Statement
 			JdbcUtils.closeStatement(stmt);
+			// 释放Connection
 			DataSourceUtils.releaseConnection(con, getDataSource());
 		}
 	}
@@ -418,6 +424,8 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Executing SQL query [" + sql + "]");
 		}
+		//创建内部类，实例化，传给execute方法，等待execute回调
+		//代理模式
 		class QueryStatementCallback implements StatementCallback<T>, SqlProvider {
 			@Override
 			@Nullable

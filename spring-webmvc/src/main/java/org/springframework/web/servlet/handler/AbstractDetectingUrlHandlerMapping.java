@@ -53,6 +53,15 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	 * Calls the {@link #detectHandlers()} method in addition to the
 	 * superclass's initialization.
 	 */
+	/**
+	 * NOTE
+	 * 201-10-12
+	 * 建立Map<urls,controller>的关系
+	 * 
+	 * AbstractDetectingUrlHandlerMapping实现了该方法
+	 * @param context
+	 * @throws BeansException
+	 */
 	@Override
 	public void initApplicationContext() throws ApplicationContextException {
 		super.initApplicationContext();
@@ -70,7 +79,8 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	/**
 	 * NOTE
 	 * 2017-10-08
-	 * 建立Map<urls,controller>的关系
+	 * 建立当前ApplicationContext中的所有controller和url的对应关系
+	 * Map<urls,controller>的关系
 	 * @throws BeansException
 	 */
 	protected void detectHandlers() throws BeansException {
@@ -112,9 +122,14 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 	/**
 	 * NOTE
 	 * 2017-10-08
-	 * 建立Map<urls,controller>的关系
-	 * 获取controoler中所有方法的url
-	 * 由子类实现，典型的模版模式
+	 * 建立Map<urls,controller>的关系<br>
+	 * 
+	 * 获取controoler中所有方法的url<br>
+	 * 
+	 * 由子类实现，不同的子类又不同的实现<br>
+	 * 典型的模版模式<br>
+	 * 
+	 * BeanNameUrlHandlerMapping
 	 * 
 	 */
 	protected abstract String[] determineUrlsForHandler(String beanName);
