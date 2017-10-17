@@ -186,6 +186,7 @@ BeanFactory接口定义了Spring IoC容器的基本功能规范。BeanFactory接
 具体的Bean实例对象的创建过程由实现了ObjectFactory接口的匿名内部类的createBean方法完成。ObjectFactory使用了委派模式，具体的Bean实例创建过程交由其实现类AbstractAutowireCapableBeanFactory完成。
 	
 **AbstractAutowireCapableBeanFactory创建Bean实例对象**
+
 AbstractAutowireCapableBeanFactory类实现了ObjectFactoryj接口，创建容器指定的的Bean实例对象，同时还对创建的Bean实例对象进行初始化处理。
 * AbstractAutowireCapableBeanFactory---createBean
 具体的依赖注入实现在：
@@ -195,11 +196,13 @@ AbstractAutowireCapableBeanFactory类实现了ObjectFactoryj接口，创建容�
 	* 对Bean属性的依赖注入进行管理
 
 **createBeanInstance方法创建Bean的java实例对象**
+
 容器初始化生成Bean所包含的Java实例对象
 * AbstractAutowireCapableBeanFactory---createBeanInstance
 * 对使用工厂方法和自动装配特性的Bean的实例化比较清除，调用相应的工厂方法或者参数匹配的构造方法即可完成实例化对象的工作，但是对于最常使用的默认无参构造方法就需要使用相应的初始化策略(JDK的反射机制或者CGLIB)来进行初始化了，在方法getInstantiationStrategy().instantiate中就具体实现类使用初始策略实例化对象。
 
 **SimpleInstantiationStrategy 类使用默认的无参构造方法创建 Bean 实例化对象**
+
 容器初始化生成Bean所包含的Java实例对象
 * SimpleInstantiationStrategy---instantiate
 * Bean的方法是否被覆盖
@@ -210,6 +213,7 @@ AbstractAutowireCapableBeanFactory类实现了ObjectFactoryj接口，创建容�
 * CGLIB是一个常用的字节码生成器的类库，它提供了一系列API实现java字节码的生成和转换功能。JDK的动态代理只能针对接口，如果一个类没有实现任何接口，要对其进行动态代理只能使用CGLIB.
 
 **populateBean方法对Bean属性的依赖注入**
+
 生成对象后，Spring IoC容器是如何将Bean的属性依赖关系注入Bean实例对象中并设置好。
 * AbstractAutowireCapableBeanFactory---populateBean
 * AbstractAutowireCapableBeanFactory---applyPropertyValues
@@ -221,6 +225,7 @@ AbstractAutowireCapableBeanFactory类实现了ObjectFactoryj接口，创建容�
 对属性值的解析是在BeanDefinitionValueResolver类的resolveValueIfNecessary方法中进行的，对属性值的依赖注入是通过bw.setPropertyValues方法实现的，在分析属性值的依赖注入之前，分析以下对属性值的解析过程。
 
 **BeanDefinitionValueResolver解析属性值**
+
 当容器在对属性进行依赖注入时，如果发现属性值需要进行类型转换，如属性值是容器中另一个Bean实例对象的引用，则容器首先需要根据属性值解析出所医用的对象，然后才能将该引用对象注入到目标实例对象的属性上去，对属性进行解析的由resolveValueIfNecessary方法实现
 * BeanDefinitionValueResolver---resolveValueIfNecessary
 * BeanDefinitionValueResolver---resolveReference
@@ -231,6 +236,7 @@ AbstractAutowireCapableBeanFactory类实现了ObjectFactoryj接口，创建容�
 通过上面的代码分析，明白了Spring是如何将引用类型，内部类以及集合类型等属性进行解析的，属性值解析完成后就可以进行依赖注入了，依赖注入的过程就是Bean对象实例设置到它所依赖的Bean对象舒心上去，依赖注入是通过bw.setPropertyValues方法实现的，该方法也使用了委托模式，在BeanWrapper接口中至少定义了方法声明，依赖注入的具体实现交由其实现类BeanWrapperImpl来完成。
 
 **BeanWrapperImpl对Bean属性的依赖注入**
+
 BeanWrapperImpl类主要是对容器中完成初始化的Bean实例对象进行属性的依赖注入，即把Bean对象设置到它所依赖的另一个Bean的属性中去。
 * AbstractNestablePropertyAccessor---setPropertyValue
 * Spring IoC容器是如何将属性的值注入到Bean实例对象中
@@ -673,24 +679,13 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 		* 实现org.framework.web.servlet.AsyncHandlerInterceptor接口，它结成HandlerInterceptor并提供一个方法afterConcurrentHandlingStarted
 			* 每次处理程序得到正确执行时，都会调用此方法而不是调用postHandler()和afterCompletion().
 			* 它也可以对发送请求进行异步处理。
-	* 拦截器和过滤器之间的区别
-		* 作用域
-			* 过滤器
-				* servlet容器下使用
-			* 拦截器
-				* Spring容器中调用
-		* 粒度
-			* 过滤器
-				* 只能在将响应返回给最终用户之前使用
-			* 拦截器
-				* 在controller对请求处理之前或之后被调用
-				* 也可以在将渲染视图呈现给用户之后被调用
-		* 中断链执行的难易成都
-			* 过滤器
-				* 必须处理请求和响应对象来引发中断，需要一些额外的动作，比如将用户重定向到错误页面
-			* 拦截器
-				* 通过在preHandler方法那返回false来简单实现
-	* 默认的Springl拦截器
+	* 拦截器和过滤器之间的区别		
+|            | 过滤器                                      | 拦截器                                      |
+| ---------- | ---------------------------------------- | ---------------------------------------- |
+| 作用域        | servlet容器下使用                             | Spring容器中调用                              |
+| 粒度         | 只能在将响应返回给最终用户之前使用                        | 在controller对请求处理之前或之后被调用,也可以在将渲染视图呈现给用户之后被调用 |
+| 中断链执行的难易程度 | 必须处理请求和响应对象来引发中断,需要一些额外的动作，比如将用户重定向到错误页面 | 通过在preHandler方法那返回false来简单实现             |
+    * 默认的Springl拦截器
 		* Spring主要将拦截器用于切换动作。
 			* 区域设置更改
 				* org.springframework.web.servlet.i18n.LocalChangeInterceptor
