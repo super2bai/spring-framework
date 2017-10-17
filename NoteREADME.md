@@ -867,7 +867,19 @@ conn.close();
 
 
 ### Spring事务源码分析
+* TransactionDefinition
+* PlatformTransactionManager
+	* DataSourceTransactionManager
+		* JDBC
+	* HibernateTransactionManager
+		* Hibernate
+	* JpaTransactionManager
+		* JPA
+	* JtaTransactionManager
+		* JTA
+* TransactionStatus
 
+TransactionDefinition--传参到getTransation-->PlatformTransactionManager--getTransaction得到-->TransactionStatus
 
 
 
