@@ -687,7 +687,8 @@ InvocationHandler是JDk动态代理的核心，生成的代理对象的方法调
 | 粒度         | 只能在将响应返回给最终用户之前使用                        | 在controller对请求处理之前或之后被调用,也可以在将渲染视图呈现给用户之后被调用 |
 | 中断链执行的难易程度 | 必须处理请求和响应对象来引发中断,需要一些额外的动作，比如将用户重定向到错误页面 | 通过在preHandler方法那返回false来简单实现             |
     
-    * 默认的Springl拦截器
+    
+   * 默认的Springl拦截器
 		* Spring主要将拦截器用于切换动作。
 			* 区域设置更改
 				* org.springframework.web.servlet.i18n.LocalChangeInterceptor
